@@ -1,4 +1,4 @@
-package input
+package stats
 
 import (
 	"net/http"
@@ -19,12 +19,12 @@ type SimpleClient struct {
 }
 
 // GetData makes the reqste to get the data and returns it.
-func (sc SimpleClient) GetData() (StatsData, error) {
+func (sc SimpleClient) GetData() (Data, error) {
 	_, err := sc.makeRequest()
 	if err != nil {
-		return StatsData{}, err
+		return Data{}, err
 	}
-	return StatsData{}, nil
+	return Data{}, nil
 }
 
 // WithHTTPClient set a new HttpClient and returns a new SimpleClient.

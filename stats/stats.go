@@ -1,14 +1,14 @@
-package input
+package stats
 
 import "time"
 
-// StatsClient is the interface to communicat with the client implementation for extracting the data
-type StatsClient interface {
-	GetData() (StatsData, error)
+// Client is the interface to communicat with the client implementation for extracting the data
+type Client interface {
+	GetData() (Data, error)
 }
 
-// StatsData is a datapoint representing a snapshot of the resources of a system to a given time.
-type StatsData struct {
+// Data is a datapoint representing a snapshot of the resources of a system to a given time.
+type Data struct {
 	Date      time.Time
 	CPU       float64
 	Processes []Process

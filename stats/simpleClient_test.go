@@ -1,4 +1,4 @@
-package input
+package stats
 
 import (
 	"bytes"
@@ -25,7 +25,7 @@ func (mhc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	return &response, nil
 }
 
-func newSimpleClientWithMockResponseHTTPClient(response string, statusCode int) StatsClient {
+func newSimpleClientWithMockResponseHTTPClient(response string, statusCode int) Client {
 	simpleClient := NewSimpleClient("xxx", "https://example.com", "yyy")
 	return simpleClient.WithHTTPClient(&mockHTTPClient{response: response, statusCode: statusCode})
 }
