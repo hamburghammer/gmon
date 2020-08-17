@@ -1,6 +1,8 @@
 package stats
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -20,10 +22,18 @@ type SimpleClient struct {
 
 // GetData makes the reqste to get the data and returns it.
 func (sc SimpleClient) GetData() (Data, error) {
-	_, err := sc.makeRequest()
+	res, err := sc.makeRequest()
 	if err != nil {
 		return Data{}, err
 	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return Data{}, err
+	}
+
+	var jd jsonData
+	err = json.Unmarshal(body, &jd)
 	return Data{}, nil
 }
 
