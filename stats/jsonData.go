@@ -16,15 +16,15 @@ type jsonData struct {
 }
 
 func (jd jsonData) transformToData() (Data, error) {
-	date, err := jd.parseISODateString(jd.Date)
+	date, err := jd.parseDateToTime()
 	if err != nil {
 		return Data{}, fmt.Errorf("transforming the JSON Data object produced an error: %w", err)
 	}
 	return Data{Date: date}, nil
 }
 
-func (jd jsonData) parseISODateString(dateStr string) (time.Time, error) {
-	t, err := time.Parse(time.RFC3339, dateStr)
+func (jd jsonData) parseDateToTime() (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, jd.Date)
 	if err != nil {
 		return time.Now(), fmt.Errorf("parsing the json Date string produced an error: %w", err)
 	}

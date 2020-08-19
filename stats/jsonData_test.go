@@ -27,7 +27,7 @@ func TestParseISODateString(t *testing.T) {
 		currentTime := time.Now().Format(time.RFC3339)
 
 		want := currentTime
-		got, err := jsonData{Date: currentTime}.parseISODateString(currentTime)
+		got, err := jsonData{Date: currentTime}.parseDateToTime()
 		if err != nil {
 			t.Errorf("An unexpected error happened: %s", err.Error())
 		}
@@ -39,14 +39,14 @@ func TestParseISODateString(t *testing.T) {
 		currentTime := "2020-08-19T15:18:06+02:00xxx"
 
 		want := "parsing the json Date string produced an error: parsing time \"2020-08-19T15:18:06+02:00xxx\": extra text: xxx"
-		_, err := jsonData{Date: currentTime}.parseISODateString(currentTime)
+		_, err := jsonData{Date: currentTime}.parseDateToTime()
 
 		assert.NotNil(t, err)
 		assert.Equal(t, want, err.Error())
 	})
 }
 
-func TestParseSpaceString(t *testing.T) {
+func TestParseMemoryString(t *testing.T) {
 	t.Run("should build a Space struct from a valid/simple string", func(t *testing.T) {
 		want := Memory{Used: 100, Total: 1000}
 		got, err := jsonData{}.parseMemoryString("100/1000")
