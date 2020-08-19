@@ -2,7 +2,7 @@ package stats
 
 import "time"
 
-// Client is the interface to communicat with the client implementation for extracting the data
+// Client is the interface to be implement by a client to access the external data.
 type Client interface {
 	GetData() (Data, error)
 }
@@ -16,7 +16,7 @@ type Data struct {
 	Mem       Memory
 }
 
-// Process is the representation of a UNIX process with some of it's information
+// Process is the representation of a UNIX process with some of its information.
 type Process struct {
 	Name string
 	Pid  int
@@ -24,7 +24,7 @@ type Process struct {
 }
 
 // Memory represents the usage of disk or RAM space.
-// It shows the used and the total space available.
+// It shows the used and the total available space.
 type Memory struct {
 	Used  int
 	Total int

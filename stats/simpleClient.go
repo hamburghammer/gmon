@@ -20,7 +20,7 @@ type SimpleClient struct {
 	hostname   string
 }
 
-// GetData makes the reqste to get the data and returns it.
+// GetData makes the reqest to get the data and returns them.
 func (sc SimpleClient) GetData() (Data, error) {
 	res, err := sc.makeRequest()
 	if err != nil {
@@ -38,7 +38,7 @@ func (sc SimpleClient) GetData() (Data, error) {
 	return jd.transformToData()
 }
 
-// WithHTTPClient set a new HttpClient and returns a new SimpleClient.
+// WithHTTPClient sets a new HttpClient and returns a new SimpleClient.
 func (sc SimpleClient) WithHTTPClient(httpClient HTTPClient) SimpleClient {
 	sc.httpClient = httpClient
 	return sc
@@ -80,7 +80,7 @@ func (sc SimpleClient) makeRequest() (*http.Response, error) {
 	return sc.httpClient.Do(request)
 }
 
-// NewSimpleClient is a confinient constructor for the SimpleClient with the http.DefaultClient.
+// NewSimpleClient is a convenient constructor for the SimpleClient with the http.DefaultClient.
 func NewSimpleClient(token string, url string, hostname string) SimpleClient {
 	return SimpleClient{http.DefaultClient, token, url, hostname}
 }
