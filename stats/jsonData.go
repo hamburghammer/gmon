@@ -31,19 +31,19 @@ func (jd jsonData) parseISODateString(dateStr string) (time.Time, error) {
 	return t, nil
 }
 
-// parseSpaceString parses a string with following structure to an Space object: "100/1000"
-func (jd jsonData) parseSpaceString(s string) (Space, error) {
+// parseMemoryString parses a string with following structure to an Memory object: "100/1000"
+func (jd jsonData) parseMemoryString(s string) (Memory, error) {
 	parts := strings.Split(s, "/")
 	if len(parts) != 2 {
-		return Space{}, fmt.Errorf("the string is missing the separating slash like 100/1000: %s", s)
+		return Memory{}, fmt.Errorf("the string is missing the separating slash like 100/1000: %s", s)
 	}
 	var partsAsInt [2]int
 	for i, part := range parts {
 		num, err := strconv.ParseInt(part, 10, 64)
 		if err != nil {
-			return Space{}, fmt.Errorf("parsing parts of a string representing a Space struct: %w", err)
+			return Memory{}, fmt.Errorf("parsing parts of a the string for the Memory struct: %w", err)
 		}
 		partsAsInt[i] = int(num)
 	}
-	return Space{Used: partsAsInt[0], Total: partsAsInt[1]}, nil
+	return Memory{Used: partsAsInt[0], Total: partsAsInt[1]}, nil
 }

@@ -12,8 +12,8 @@ type Data struct {
 	Date      time.Time
 	CPU       float64
 	Processes []Process
-	Disk      Space
-	Mem       Space
+	Disk      Memory
+	Mem       Memory
 }
 
 // Process is the representation of a UNIX process with some of it's information
@@ -23,9 +23,9 @@ type Process struct {
 	CPU  float64
 }
 
-// Space represents the usage of disk or RAM space.
+// Memory represents the usage of disk or RAM space.
 // It shows the used and the total space available.
-type Space struct {
+type Memory struct {
 	Used  int
 	Total int
 }

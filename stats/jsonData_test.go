@@ -48,8 +48,8 @@ func TestParseISODateString(t *testing.T) {
 
 func TestParseSpaceString(t *testing.T) {
 	t.Run("should build a Space struct from a valid/simple string", func(t *testing.T) {
-		want := Space{Used: 100, Total: 1000}
-		got, err := jsonData{}.parseSpaceString("100/1000")
+		want := Memory{Used: 100, Total: 1000}
+		got, err := jsonData{}.parseMemoryString("100/1000")
 		if err != nil {
 			t.Errorf("An unexpected error happened: %s", err.Error())
 		}
@@ -59,15 +59,15 @@ func TestParseSpaceString(t *testing.T) {
 
 	t.Run("should return error if not seperated by a slash", func(t *testing.T) {
 		want := "the string is missing the separating slash like 100/1000: 100 1000"
-		_, err := jsonData{}.parseSpaceString("100 1000")
+		_, err := jsonData{}.parseMemoryString("100 1000")
 
 		assert.NotNil(t, err)
 		assert.Equal(t, want, err.Error())
 	})
 
 	t.Run("should return error if not seperated by a slash", func(t *testing.T) {
-		want := "parsing parts of a string representing a Space struct: strconv.ParseInt: parsing \"foo\": invalid syntax"
-		_, err := jsonData{}.parseSpaceString("foo/1000")
+		want := "parsing parts of a the string for the Memory struct: strconv.ParseInt: parsing \"foo\": invalid syntax"
+		_, err := jsonData{}.parseMemoryString("foo/1000")
 
 		assert.NotNil(t, err)
 		assert.Equal(t, want, err.Error())
