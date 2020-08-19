@@ -33,7 +33,7 @@ func (jd jsonData) transformToData() (Data, error) {
 		return Data{}, fmt.Errorf("%s: %w", errorMessage, err)
 	}
 
-	return Data{Date: date, Disk: disk, Mem: mem}, nil
+	return Data{Date: date, Disk: disk, Mem: mem, CPU: jd.CPU, Processes: jd.Processes}, nil
 }
 
 func (jd jsonData) parseDateToTime() (time.Time, error) {

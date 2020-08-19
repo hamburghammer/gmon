@@ -8,7 +8,8 @@ import (
 )
 
 func getJSONData() jsonData {
-	return jsonData{Date: "2020-08-19T15:18:06+02:00", Mem: "100/1000", Disk: "1000/10000"}
+	processes := []Process{{Name: "test", Pid: 1, CPU: 0.1}}
+	return jsonData{Date: "2020-08-19T15:18:06+02:00", Mem: "100/1000", Disk: "1000/10000", CPU: 0.1, Processes: processes}
 }
 
 func TestTransformation(t *testing.T) {
@@ -65,6 +66,22 @@ func TestTransformation(t *testing.T) {
 		_, got := wrongMemJSONData.transformToData()
 
 		assert.Equal(t, want, got.Error())
+	})
+
+	t.Run("should add CPU", func(t *testing.T) {
+		want := getJSONData().CPU
+		got, err := getJSONData().transformToData()
+
+		assert.Nil(t, err)
+		assert.Equal(t, want, got.CPU)
+	})
+
+	t.Run("should add Processes", func(t *testing.T) {
+		want := getJSONData().Processes
+		got, err := getJSONData().transformToData()
+
+		assert.Nil(t, err)
+		assert.Equal(t, want, got.Processes)
 	})
 }
 
