@@ -16,11 +16,24 @@ type jsonData struct {
 }
 
 func (jd jsonData) transformToData() (Data, error) {
+	errorMessage := "transforming jsonData to Data"
+
 	date, err := jd.parseDateToTime()
 	if err != nil {
-		return Data{}, fmt.Errorf("transforming the JSON Data object produced an error: %w", err)
+		return Data{}, fmt.Errorf("%s: %w", errorMessage, err)
 	}
-	return Data{Date: date}, nil
+
+	disk, err := jd.parseDiskToMemory()
+	if err != nil {
+		return Data{}, fmt.Errorf("%s: %w", errorMessage, err)
+	}
+
+	mem, err := jd.parseMemToMemory()
+	if err != nil {
+		return Data{}, fmt.Errorf("%s: %w", errorMessage, err)
+	}
+
+	return Data{Date: date, Disk: disk, Mem: mem}, nil
 }
 
 func (jd jsonData) parseDateToTime() (time.Time, error) {
@@ -29,6 +42,22 @@ func (jd jsonData) parseDateToTime() (time.Time, error) {
 		return time.Now(), fmt.Errorf("parsing the json Date string produced an error: %w", err)
 	}
 	return t, nil
+}
+
+func (jd jsonData) parseDiskToMemory() (Memory, error) {
+	disk, err := jd.parseMemoryString(jd.Disk)
+	if err != nil {
+		return Memory{}, fmt.Errorf("disk string: %w", err)
+	}
+	return disk, err
+}
+
+func (jd jsonData) parseMemToMemory() (Memory, error) {
+	mem, err := jd.parseMemoryString(jd.Mem)
+	if err != nil {
+		return Memory{}, fmt.Errorf("mem string: %w", err)
+	}
+	return mem, err
 }
 
 // parseMemoryString parses a string with following structure to an Memory object: "100/1000"
