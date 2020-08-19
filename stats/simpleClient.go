@@ -26,6 +26,7 @@ func (sc SimpleClient) GetData() (Data, error) {
 	if err != nil {
 		return Data{}, err
 	}
+
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -34,7 +35,7 @@ func (sc SimpleClient) GetData() (Data, error) {
 
 	var jd jsonData
 	err = json.Unmarshal(body, &jd)
-	return Data{}, nil
+	return jd.transformToData()
 }
 
 // WithHTTPClient set a new HttpClient and returns a new SimpleClient.
