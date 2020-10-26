@@ -26,7 +26,7 @@ func TestTransformation(t *testing.T) {
 		wrongDateJSONData := getJSONData()
 		wrongDateJSONData.Date = "2020-08-19T15:18:06+02:00xxx"
 
-		want := "transforming jsonData to Data: parsing the json Date string produced an error: parsing time \"2020-08-19T15:18:06+02:00xxx\": extra text: xxx"
+		want := "transforming jsonData to Data: parsing the json Date string produced an error: parsing time \"2020-08-19T15:18:06+02:00xxx\": extra text: \"xxx\""
 		_, got := wrongDateJSONData.transformToData()
 
 		assert.Equal(t, want, got.Error())
@@ -101,7 +101,7 @@ func TestParseISODateString(t *testing.T) {
 	t.Run("should return error on wrong string", func(t *testing.T) {
 		currentTime := "2020-08-19T15:18:06+02:00xxx"
 
-		want := "parsing the json Date string produced an error: parsing time \"2020-08-19T15:18:06+02:00xxx\": extra text: xxx"
+		want := "parsing the json Date string produced an error: parsing time \"2020-08-19T15:18:06+02:00xxx\": extra text: \"xxx\""
 		_, err := jsonData{Date: currentTime}.parseDateToTime()
 
 		assert.NotNil(t, err)
