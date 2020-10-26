@@ -23,14 +23,14 @@ steps:
   - go mod download
   - go test -race -short ./...
 
-- name: build
-  image: golang
-  volumes:
-  - name: cache
-    path: /go
-  commands:
-  - go mod download
-  - go build
+    #- name: build
+    #  image: golang
+    #  volumes:
+    #  - name: cache
+    #    path: /go
+    #  commands:
+    #  - go mod download
+    #  - go build
 
 volumes:
 - name: cache
