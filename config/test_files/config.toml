@@ -1,8 +1,0 @@
-[stats]
-endpoint = "https://stats.example.com"
-hostname = "test"
-token = "xxx"
-
-[gotify]
-endpoint = "https://push.example.com"
-token = "xxx"
