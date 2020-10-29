@@ -9,12 +9,12 @@ import (
 
 // TomlLoader handels a toml configuration file
 type TomlLoader struct {
-	file io.Reader
+	reader io.Reader
 }
 
 // Load implementation of the Loader interface to load the config from the file
 func (tl TomlLoader) Load() (Data, error) {
-	tomlData, err := ioutil.ReadAll(tl.file)
+	tomlData, err := ioutil.ReadAll(tl.reader)
 	if err != nil {
 		return Data{}, err
 	}
@@ -28,7 +28,7 @@ func (tl TomlLoader) Load() (Data, error) {
 	return data, nil
 }
 
-// NewTomlFileLoader constructor for the TomlFileLoader struct
-func NewTomlFileLoader(file io.Reader) TomlLoader {
-	return TomlLoader{file: file}
+// NewTomlLoader constructor for the TomlFileLoader struct
+func NewTomlLoader(reader io.Reader) TomlLoader {
+	return TomlLoader{reader: reader}
 }
