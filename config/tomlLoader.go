@@ -2,7 +2,6 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 
 	"github.com/pelletier/go-toml"
 )
@@ -14,13 +13,8 @@ type TomlLoader struct {
 
 // Load implementation of the Loader interface to load the config from the file
 func (tl TomlLoader) Load() (Data, error) {
-	tomlData, err := ioutil.ReadAll(tl.reader)
-	if err != nil {
-		return Data{}, err
-	}
-
 	data := Data{}
-	err = toml.Unmarshal(tomlData, &data)
+	err := toml.NewDecoder(tl.reader).Decode(&data)
 	if err != nil {
 		return Data{}, err
 	}
