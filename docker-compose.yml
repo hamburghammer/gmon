@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  gotify:
+    image: gotify/server:latest
+    ports:
+      - "80:80"
