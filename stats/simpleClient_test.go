@@ -46,7 +46,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		_, err := simpleClient.GetData()
 		assert.Nil(t, err)
 
-		want := fmt.Sprintf("/%s", hostname)
+		want := fmt.Sprintf("/hosts/%s/stats", hostname)
 
 		assert.Equal(t, want, mockClient.req.URL.Path)
 	})
