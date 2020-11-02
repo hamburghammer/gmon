@@ -20,8 +20,8 @@ type SimpleClient struct {
 }
 
 // Notify makes the request to push the data to the gotify server.
-func (sc SimpleClient) Notify(Data) (interface{}, error) {
-	res, err := sc.makeRequest(Data{})
+func (sc SimpleClient) Notify(data Data) (interface{}, error) {
+	res, err := sc.makeRequest(data)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (sc SimpleClient) makeRequest(data Data) (*http.Response, error) {
 
 // NewSimpleClient is a convenient constructor for the SimpleClient with the http.DefaultClient.
 func NewSimpleClient(token string, url string) SimpleClient {
-	return SimpleClient{http.DefaultClient, apiTokenPlaceholder, urlPlaceholder}
+	return SimpleClient{http.DefaultClient, token, url}
 }
 
 var apiTokenPlaceholder = "ATpi1Udr-HsU6ka"
