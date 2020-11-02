@@ -45,7 +45,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		_, err := simpleClient.Notify(data)
 		assert.Nil(t, err)
 
-		assert.Equal(t, token, mockClient.req.Header.Get("X-Gotify-Token"))
+		assert.Equal(t, token, mockClient.req.Header.Get("X-Gotify-Key"))
 	})
 
 	t.Run("should return error if url could not be parse", func(t *testing.T) {
@@ -57,7 +57,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		_, err := simpleClient.Notify(data)
 		assert.NotNil(t, err)
 
-		want := "parse \" https:\": first path segment in URL cannot contain colon"
+		want := "parse  https:: first path segment in URL cannot contain colon"
 
 		assert.Equal(t, want, err.Error())
 	})
