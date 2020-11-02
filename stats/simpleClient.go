@@ -2,6 +2,7 @@ package stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -50,7 +51,7 @@ func (sc SimpleClient) buildURL() (string, error) {
 		return "", err
 	}
 
-	baseURL.Path += sc.hostname
+	baseURL.Path += fmt.Sprintf("/hosts/%s/stats", sc.hostname)
 
 	return baseURL.String(), nil
 }
