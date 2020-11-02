@@ -51,7 +51,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		assert.Equal(t, want, mockClient.req.URL.Path)
 	})
 
-	t.Run("should build url with the token as query encoded", func(t *testing.T) {
+	t.Run("should build url with the token as header", func(t *testing.T) {
 		mockClient := getMockClientWithValidResponse()
 		token := "xxx"
 		simpleClient := NewSimpleClient(token, "https://example.com", "yyy")
@@ -60,9 +60,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		_, err := simpleClient.GetData()
 		assert.Nil(t, err)
 
-		want := fmt.Sprintf("token=%s", token)
-
-		assert.Equal(t, want, mockClient.req.URL.RawQuery)
+		assert.Equal(t, token, mockClient.req.Header.Get("Token"))
 	})
 
 	t.Run("should return error if url could not be parse", func(t *testing.T) {

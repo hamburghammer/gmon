@@ -50,10 +50,6 @@ func (sc SimpleClient) buildURL() (string, error) {
 		return "", err
 	}
 
-	queryString := baseURL.Query()
-	queryString.Add("token", sc.token)
-
-	baseURL.RawQuery = queryString.Encode()
 	baseURL.Path += sc.hostname
 
 	return baseURL.String(), nil
@@ -69,6 +65,7 @@ func (sc SimpleClient) buildRequest() (*http.Request, error) {
 	if err != nil {
 		return &http.Request{}, err
 	}
+	request.Header.Add("Token", sc.token)
 	return request, nil
 }
 
