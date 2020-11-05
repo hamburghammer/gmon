@@ -2,10 +2,11 @@ package alert
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type mockHTTPClient struct {
@@ -24,7 +25,7 @@ func (mhc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func getMockClientWithValidResponse() mockHTTPClient {
-	responseJSON := "{\"Date\":\"2020-08-19T17:45:56+02:00\",\"CPU\":1.9900497512574382,\"Mem\":\"4621/16022\",\"Disk\":\"51271/224323\",\"Processes\":[{\"Name\":\"gstat\",\"Pid\":1,\"CPU\":37.58064430461327}]}"
+	responseJSON := ""
 	return mockHTTPClient{response: responseJSON, statusCode: 200}
 }
 
@@ -57,7 +58,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		_, err := simpleClient.Notify(data)
 		assert.NotNil(t, err)
 
-		want := "parse  https:: first path segment in URL cannot contain colon"
+		want := "parse \" https:\": first path segment in URL cannot contain colon"
 
 		assert.Equal(t, want, err.Error())
 	})
