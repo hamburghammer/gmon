@@ -1,14 +1,13 @@
 package alert
 
-// the interface to be implemented by the evaluation module to pass data that needs to be send via api
-type NotifyInterface interface {
-	Notify(Data) (error)
+// Notifier to send notifications to an endpoint
+type Notifier interface {
+	Notify(Data) error
 }
 
+// Data hold the information to send a new notification
 type Data struct {
-	Title string
-	Message string
+	Title    string
+	Message  string
 	Priority string
 }
-
-
