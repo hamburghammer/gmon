@@ -13,15 +13,15 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// SimpleClient is a client implementation to get the data from an http endpoint.
-type SimpleClient struct {
+// GotifyClient is a client implementation to get the data from an http endpoint.
+type GotifyClient struct {
 	httpClient HTTPClient
 	token      string
 	url        string
 }
 
 // Notify makes the request to push the data to the gotify server.
-func (sc SimpleClient) Notify(data Data) error {
+func (sc GotifyClient) Notify(data Data) error {
 	_, err := sc.makeRequest(data)
 	if err != nil {
 		return err
@@ -30,12 +30,12 @@ func (sc SimpleClient) Notify(data Data) error {
 }
 
 // WithHTTPClient sets a new HttpClient and returns a new SimpleClient.
-func (sc SimpleClient) WithHTTPClient(httpClient HTTPClient) SimpleClient {
+func (sc GotifyClient) WithHTTPClient(httpClient HTTPClient) GotifyClient {
 	sc.httpClient = httpClient
 	return sc
 }
 
-func (sc SimpleClient) buildURL() (string, error) {
+func (sc GotifyClient) buildURL() (string, error) {
 	baseURL, err := url.Parse(sc.url)
 	if err != nil {
 		return "", err
@@ -45,7 +45,7 @@ func (sc SimpleClient) buildURL() (string, error) {
 	return baseURL.String(), nil
 }
 
-func (sc SimpleClient) buildRequest(data Data) (*http.Request, error) {
+func (sc GotifyClient) buildRequest(data Data) (*http.Request, error) {
 	url, err := sc.buildURL()
 	if err != nil {
 		return &http.Request{}, err
@@ -65,7 +65,7 @@ func (sc SimpleClient) buildRequest(data Data) (*http.Request, error) {
 	return request, nil
 }
 
-func (sc SimpleClient) makeRequest(data Data) (*http.Response, error) {
+func (sc GotifyClient) makeRequest(data Data) (*http.Response, error) {
 	request, err := sc.buildRequest(data)
 	if err != nil {
 		return &http.Response{}, err
@@ -73,7 +73,7 @@ func (sc SimpleClient) makeRequest(data Data) (*http.Response, error) {
 	return sc.httpClient.Do(request)
 }
 
-// NewSimpleClient is a convenient constructor for the SimpleClient with the http.DefaultClient.
-func NewSimpleClient(token string, url string) SimpleClient {
-	return SimpleClient{http.DefaultClient, token, url}
+// NewGotifyClient is a convenient constructor for the SimpleClient with the http.DefaultClient.
+func NewGotifyClient(token string, url string) GotifyClient {
+	return GotifyClient{http.DefaultClient, token, url}
 }

@@ -29,7 +29,7 @@ func getMockClientWithValidResponse() mockHTTPClient {
 	return mockHTTPClient{response: responseJSON, statusCode: 200}
 }
 
-func TestSimpleClientRequestBuilding(t *testing.T) {
+func TestGotifyClientRequestBuilding(t *testing.T) {
 
 	data := Data{
 		Title:    "title",
@@ -40,7 +40,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 	t.Run("should build url with the token as header", func(t *testing.T) {
 		mockClient := getMockClientWithValidResponse()
 		token := "xxx"
-		simpleClient := NewSimpleClient(token, "https://example.com")
+		simpleClient := NewGotifyClient(token, "https://example.com")
 		simpleClient = simpleClient.WithHTTPClient(&mockClient)
 
 		err := simpleClient.Notify(data)
@@ -52,7 +52,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 	t.Run("should return error if url could not be parse", func(t *testing.T) {
 		mockClient := &mockHTTPClient{}
 		token := "xxx"
-		simpleClient := NewSimpleClient(token, " https:")
+		simpleClient := NewGotifyClient(token, " https:")
 		simpleClient = simpleClient.WithHTTPClient(mockClient)
 
 		err := simpleClient.Notify(data)
