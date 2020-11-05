@@ -3,6 +3,7 @@ package alert
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 )
@@ -20,18 +21,12 @@ type SimpleClient struct {
 }
 
 // Notify makes the request to push the data to the gotify server.
-func (sc SimpleClient) Notify(data Data) (interface{}, error) {
-	res, err := sc.makeRequest(data)
+func (sc SimpleClient) Notify(data Data) error {
+	_, err := sc.makeRequest(data)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	var body struct{}
-	defer res.Body.Close()
-	err = json.NewDecoder(res.Body).Decode(&body)
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
+	return nil
 }
 
 // WithHTTPClient sets a new HttpClient and returns a new SimpleClient.
@@ -46,6 +41,7 @@ func (sc SimpleClient) buildURL() (string, error) {
 		return "", err
 	}
 
+	baseURL.Path = "/message"
 	return baseURL.String(), nil
 }
 
@@ -57,7 +53,7 @@ func (sc SimpleClient) buildRequest(data Data) (*http.Request, error) {
 
 	jsonStr, err := json.Marshal(data)
 	if err != nil {
-		return &http.Request{}, err
+		return &http.Request{}, fmt.Errorf("Mashaling the data produced an error: %w", err)
 	}
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonStr))
 	if err != nil {
@@ -65,6 +61,7 @@ func (sc SimpleClient) buildRequest(data Data) (*http.Request, error) {
 	}
 
 	request.Header.Add("X-Gotify-Key", sc.token)
+	request.Header.Add("Content-Type", "application/json")
 	return request, nil
 }
 
@@ -80,6 +77,3 @@ func (sc SimpleClient) makeRequest(data Data) (*http.Response, error) {
 func NewSimpleClient(token string, url string) SimpleClient {
 	return SimpleClient{http.DefaultClient, token, url}
 }
-
-var apiTokenPlaceholder = "ATpi1Udr-HsU6ka"
-var urlPlaceholder = "http://localhost:8080"

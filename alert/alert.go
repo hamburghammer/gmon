@@ -7,7 +7,7 @@ type Notifier interface {
 
 // Data hold the information to send a new notification
 type Data struct {
-	Title    string
-	Message  string
-	Priority string
+	Title    string `json:"title"`
+	Message  string `json:"message"`
+	Priority int    `json:"priority"`
 }

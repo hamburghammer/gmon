@@ -34,7 +34,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 	data := Data{
 		Title:    "title",
 		Message:  "message",
-		Priority: "high",
+		Priority: 0,
 	}
 
 	t.Run("should build url with the token as header", func(t *testing.T) {
@@ -43,7 +43,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		simpleClient := NewSimpleClient(token, "https://example.com")
 		simpleClient = simpleClient.WithHTTPClient(&mockClient)
 
-		_, err := simpleClient.Notify(data)
+		err := simpleClient.Notify(data)
 		assert.Nil(t, err)
 
 		assert.Equal(t, token, mockClient.req.Header.Get("X-Gotify-Key"))
@@ -55,7 +55,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		simpleClient := NewSimpleClient(token, " https:")
 		simpleClient = simpleClient.WithHTTPClient(mockClient)
 
-		_, err := simpleClient.Notify(data)
+		err := simpleClient.Notify(data)
 		assert.NotNil(t, err)
 
 		want := "parse \" https:\": first path segment in URL cannot contain colon"
