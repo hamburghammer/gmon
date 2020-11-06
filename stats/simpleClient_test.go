@@ -44,7 +44,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		simpleClient = simpleClient.WithHTTPClient(&mockClient)
 
 		_, err := simpleClient.GetData()
-		assert.Nil(t, err)
+		assert.Error(t, err)
 
 		want := fmt.Sprintf("/hosts/%s/stats", hostname)
 
@@ -58,7 +58,7 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		simpleClient = simpleClient.WithHTTPClient(&mockClient)
 
 		_, err := simpleClient.GetData()
-		assert.Nil(t, err)
+		assert.Error(t, err)
 
 		assert.Equal(t, token, mockClient.req.Header.Get("Token"))
 	})
@@ -80,12 +80,12 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 
 func TestSimpleClientGetData(t *testing.T) {
 	t.Run("should deserialize the data", func(t *testing.T) {
-		responseJSON := "{\"Date\":\"2020-08-19T17:45:56+02:00\",\"CPU\":1.9900497512574382,\"Mem\":\"4621/16022\",\"Disk\":\"51271/224323\",\"Processes\":[{\"Name\":\"gstat\",\"Pid\":1,\"CPU\":37.58064430461327}]}"
+		responseJSON := "[{\"hostname\": \"foo\",\"date\":\"2020-08-19T17:45:56+02:00\",\"cpu\":1.9900497512574382,\"mem\":{\"used\": 4621, \"total\": 16022},\"disk\":{\"used\": 51271, \"total\": 224323},\"processes\":[{\"name\":\"gstat\",\"Pid\":1,\"CPU\":37.58064430461327}]}]"
 		parsedTime, _ := time.Parse(time.RFC3339, "2020-08-19T17:45:56+02:00")
 
 		mockClient := newSimpleClientWithMockResponseHTTPClient(responseJSON, 200)
 
-		want := Data{Date: parsedTime, CPU: 1.9900497512574382, Mem: Memory{Used: 4621, Total: 16022}, Disk: Memory{Used: 51271, Total: 224323}, Processes: []Process{{Name: "gstat", Pid: 1, CPU: 37.58064430461327}}}
+		want := Data{Hostname: "foo", Date: parsedTime, CPU: 1.9900497512574382, Mem: Memory{Used: 4621, Total: 16022}, Disk: Memory{Used: 51271, Total: 224323}, Processes: []Process{{Name: "gstat", Pid: 1, CPU: 37.58064430461327}}}
 		got, err := mockClient.GetData()
 
 		assert.Nil(t, err)

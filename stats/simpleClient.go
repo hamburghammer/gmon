@@ -2,8 +2,10 @@ package stats
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -34,9 +36,13 @@ func (sc SimpleClient) GetData() (Data, error) {
 		return Data{}, err
 	}
 
-	var jd jsonData
+	log.Println(string(body))
+	var jd []jsonData
 	err = json.Unmarshal(body, &jd)
-	return jd.transformToData()
+	if len(jd) < 1 {
+		return Data{}, errors.New("No data received from the db")
+	}
+	return jd[0].transformToData()
 }
 
 // WithHTTPClient sets a new HttpClient and returns a new SimpleClient.
@@ -52,6 +58,9 @@ func (sc SimpleClient) buildURL() (string, error) {
 	}
 
 	baseURL.Path += fmt.Sprintf("/hosts/%s/stats", sc.hostname)
+	q := baseURL.Query()
+	q.Add("limit", "1")
+	baseURL.RawQuery = q.Encode()
 
 	return baseURL.String(), nil
 }
@@ -61,6 +70,7 @@ func (sc SimpleClient) buildRequest() (*http.Request, error) {
 	if err != nil {
 		return &http.Request{}, err
 	}
+	log.Println(url)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

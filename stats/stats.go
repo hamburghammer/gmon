@@ -9,6 +9,7 @@ type Client interface {
 
 // Data is a datapoint representing a snapshot of the resources of a system to a given time.
 type Data struct {
+	Hostname  string
 	Date      time.Time
 	CPU       float64
 	Processes []Process
