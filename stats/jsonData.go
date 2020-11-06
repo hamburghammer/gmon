@@ -2,17 +2,19 @@ package stats
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
 )
 
 type jsonData struct {
+	Hostname  string
 	Date      string
 	CPU       float64
 	Processes []Process
-	Disk      string
-	Mem       string
+	Disk      Memory
+	Mem       Memory
 }
 
 func (jd jsonData) transformToData() (Data, error) {
@@ -23,41 +25,16 @@ func (jd jsonData) transformToData() (Data, error) {
 		return Data{}, fmt.Errorf("%s: %w", errorMessage, err)
 	}
 
-	disk, err := jd.parseDiskToMemory()
-	if err != nil {
-		return Data{}, fmt.Errorf("%s: %w", errorMessage, err)
-	}
-
-	mem, err := jd.parseMemToMemory()
-	if err != nil {
-		return Data{}, fmt.Errorf("%s: %w", errorMessage, err)
-	}
-
-	return Data{Date: date, Disk: disk, Mem: mem, CPU: jd.CPU, Processes: jd.Processes}, nil
+	return Data{Hostname: jd.Hostname, Date: date, Disk: jd.Disk, Mem: jd.Mem, CPU: jd.CPU, Processes: jd.Processes}, nil
 }
 
 func (jd jsonData) parseDateToTime() (time.Time, error) {
+	log.Println(jd.Date)
 	t, err := time.Parse(time.RFC3339, jd.Date)
 	if err != nil {
 		return time.Now(), fmt.Errorf("parsing the json Date string produced an error: %w", err)
 	}
 	return t, nil
-}
-
-func (jd jsonData) parseDiskToMemory() (Memory, error) {
-	disk, err := jd.parseMemoryString(jd.Disk)
-	if err != nil {
-		return Memory{}, fmt.Errorf("disk string: %w", err)
-	}
-	return disk, err
-}
-
-func (jd jsonData) parseMemToMemory() (Memory, error) {
-	mem, err := jd.parseMemoryString(jd.Mem)
-	if err != nil {
-		return Memory{}, fmt.Errorf("mem string: %w", err)
-	}
-	return mem, err
 }
 
 // parseMemoryString parses a string with following structure to an Memory object: "100/1000"
