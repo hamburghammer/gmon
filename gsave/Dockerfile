@@ -1,11 +1,10 @@
 FROM golang AS build
-RUN go get -u github.com/hamburghammer/gsave
-
+ENV GO111MODULE="on"
 ENV CGO_ENABLED=0
-RUN go build -o /gsave github.com/hamburghammer/gsave
+RUN go get -u github.com/hamburghammer/gsave@d0802fd3d77160b61cb2303b92642b01f2357d57
 
 FROM alpine 
-COPY --from=build /gsave /usr/bin/
+COPY --from=build /go/bin/gsave /usr/bin/
 
 ENTRYPOINT [ "gsave" ]
 CMD [ "--verbose" ]
