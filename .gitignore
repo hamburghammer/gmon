@@ -16,6 +16,7 @@ gmon
 vendor/
 
 # IDE files
+.vscode/
 .idea
 
 .data/
