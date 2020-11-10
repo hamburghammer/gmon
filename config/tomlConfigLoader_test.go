@@ -48,3 +48,13 @@ func TestTomlLoader_LoadGotifyConfig(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, want, got)
 }
+
+func TestTomlLoader_LoadIntervalConfig(t *testing.T) {
+	file := &mockReader{content: []byte("rate = 1")}
+
+	want := Config{Interval: 1}
+	got, err := TomlConfigLoader{reader: file}.Load()
+
+	require.Nil(t, err)
+	require.Equal(t, want, got)
+}

@@ -11,6 +11,10 @@ type Loader interface {
 type Config struct {
 	Stats  Stats
 	Gotify Gotify
+
+	// Interval configures the rate in with it should check for updates.
+	// It's given as minutes -> ones every x minutes.
+	Interval int
 }
 
 // Stats the configuration to configure a stats client
