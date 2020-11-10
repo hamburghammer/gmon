@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/hamburghammer/gmon/alert"
+	"github.com/hamburghammer/gmon/analyse"
 	"github.com/hamburghammer/gmon/stats"
 )
 
@@ -13,6 +14,17 @@ func main() {
 	data, err := statsClient.GetData()
 	if err != nil {
 		log.Println(err)
+	}
+
+	rules := []analyse.Analyser{&analyse.CPURule{Rule: analyse.Rule{Compare: ">", Name: "Foo cpu"}, Warning: 0.5, Alert: 1}}
+
+	for _, rule := range rules {
+		alert, err := rule.Analyse(data)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		log.Println(alert)
 	}
 
 	jsonData, err := json.Marshal(data)
