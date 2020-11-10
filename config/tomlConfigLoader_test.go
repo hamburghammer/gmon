@@ -29,8 +29,8 @@ func TestTomlLoader_LoadStatsConfig(t *testing.T) {
 	token = "xxx"`)}
 
 	statsConfig := Stats{Endpoint: "https://stats.example.com", Hostname: "test", Token: "xxx"}
-	want := Data{Stats: statsConfig}
-	got, err := TomlLoader{reader: file}.Load()
+	want := Config{Stats: statsConfig}
+	got, err := TomlConfigLoader{reader: file}.Load()
 
 	require.Nil(t, err)
 	require.Equal(t, want, got)
@@ -42,8 +42,8 @@ func TestTomlLoader_LoadGotifyConfig(t *testing.T) {
 	token = "xxx"`)}
 
 	gotifyConfig := Gotify{Endpoint: "https://push.example.com", Token: "xxx"}
-	want := Data{Gotify: gotifyConfig}
-	got, err := TomlLoader{reader: file}.Load()
+	want := Config{Gotify: gotifyConfig}
+	got, err := TomlConfigLoader{reader: file}.Load()
 
 	require.Nil(t, err)
 	require.Equal(t, want, got)
