@@ -4,7 +4,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type mockReader struct {
@@ -22,21 +22,29 @@ func (mr *mockReader) Read(b []byte) (n int, err error) {
 	return
 }
 
-func TestTomlFileLoaderLoad(t *testing.T) {
+func TestTomlLoader_LoadStatsConfig(t *testing.T) {
 	file := &mockReader{content: []byte(`[stats]
 	endpoint = "https://stats.example.com"
 	hostname = "test"
-	token = "xxx"
-	
-	[gotify]
-	endpoint = "https://push.example.com"
 	token = "xxx"`)}
 
 	statsConfig := Stats{Endpoint: "https://stats.example.com", Hostname: "test", Token: "xxx"}
-	gotifyConfig := Gotify{Endpoint: "https://push.example.com", Token: "xxx"}
-	want := Data{Stats: statsConfig, Gotify: gotifyConfig}
+	want := Data{Stats: statsConfig}
 	got, err := TomlLoader{reader: file}.Load()
 
-	assert.Nil(t, err)
-	assert.Equal(t, want, got)
+	require.Nil(t, err)
+	require.Equal(t, want, got)
+}
+
+func TestTomlLoader_LoadGotifyConfig(t *testing.T) {
+	file := &mockReader{content: []byte(`[gotify]
+	endpoint = "https://push.example.com"
+	token = "xxx"`)}
+
+	gotifyConfig := Gotify{Endpoint: "https://push.example.com", Token: "xxx"}
+	want := Data{Gotify: gotifyConfig}
+	got, err := TomlLoader{reader: file}.Load()
+
+	require.Nil(t, err)
+	require.Equal(t, want, got)
 }
