@@ -7,6 +7,7 @@ import (
 var CompareMatchingError = errors.New("The compare character does not match neither '>', '<', '=' or '!='")
 
 type compareFloatFunc func(want float64) bool
+type compareIntFunc func(want int) bool
 
 type Rule struct {
 	Name        string
@@ -16,18 +17,7 @@ type Rule struct {
 	Compare string
 }
 
-type MemoryRule struct {
-	Rule
-	Warning int
-	Alert   int
-}
-
-type DiskRule struct {
-	Rule
-	MemoryRule
-}
-
 type RAMRule struct {
 	Rule
-	MemoryRule
+	DiskRule
 }

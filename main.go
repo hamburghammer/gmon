@@ -48,7 +48,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println(rules)
+	log.Printf("%+v", rules)
 
 	statsClient := stats.NewSimpleClient(configuration.Stats.Token, configuration.Stats.Endpoint, configuration.Stats.Hostname)
 	gotifyClient := alert.NewGotifyClient(configuration.Gotify.Token, configuration.Gotify.Endpoint)
@@ -70,25 +70,55 @@ func loadFile(path string) (io.Reader, error) {
 // Monitor the stats -> get, analyse and notify
 func Monitor(statsClient stats.Client, gotifyClient alert.Notifier, interval int, rules config.Rules) error {
 	for {
-		stats, err := statsClient.GetData()
+		data, err := statsClient.GetData()
 		if err != nil {
 			return err
 		}
 
-		for _, rule := range rules.CPU {
-			result, err := rule.Analyse(stats)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			log.Println(result)
-			if result.AlertStatus != analyse.StatusOK {
-				err = gotifyClient.Notify(alert.Data{Title: result.Title, Message: result.StatusMessage})
-				if err != nil {
-					return err
-				}
-			}
-		}
+		var f analyse.Analyser
+		f = analyse.CPURule{}
+		f.Analyse(stats.Data{})
+
+		applyRules(cpuRulesToAnalyse(rules.CPU), data, gotifyClient)
+		applyRules(diskRulesToAnalyse(rules.Disk), data, gotifyClient)
+
 		time.Sleep(time.Duration(interval) * time.Minute)
 	}
+}
+
+func applyRules(rules []analyse.Analyser, stats stats.Data, gotifyClient alert.Notifier) error {
+	for _, rule := range rules {
+		result, err := rule.Analyse(stats)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		log.Println(result)
+		if result.AlertStatus != analyse.StatusOK {
+			err = gotifyClient.Notify(alert.Data{Title: result.Title, Message: result.StatusMessage})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func cpuRulesToAnalyse(rs []analyse.CPURule) []analyse.Analyser {
+	rules := make([]analyse.Analyser, len(rs))
+	for i, r := range rs {
+		rules[i] = r
+	}
+
+	return rules
+}
+
+func diskRulesToAnalyse(rs []analyse.DiskRule) []analyse.Analyser {
+	rules := make([]analyse.Analyser, len(rs))
+	for i, r := range rs {
+		rules[i] = r
+	}
+
+	return rules
 }

@@ -14,7 +14,7 @@ type CPURule struct {
 }
 
 // Analyse executes the rule on a datapoint.
-func (c *CPURule) Analyse(data stats.Data) (Result, error) {
+func (c CPURule) Analyse(data stats.Data) (Result, error) {
 	notification := Result{Title: c.Name, Description: c.Description}
 	var cf compareFloatFunc
 
@@ -43,7 +43,7 @@ func (c *CPURule) Analyse(data stats.Data) (Result, error) {
 	return notification, nil
 }
 
-func (c *CPURule) compare(cf compareFloatFunc, compareChar string) Status {
+func (c CPURule) compare(cf compareFloatFunc, compareChar string) Status {
 	if c.Alert != 0 && cf(c.Alert) {
 		return Status{AlertStatus: StatusAlert, StatusMessage: fmt.Sprintf("CPU usage %s as %f", compareChar, c.Alert)}
 	} else if c.Warning != 0 && cf(c.Warning) {

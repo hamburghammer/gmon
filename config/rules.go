@@ -9,5 +9,6 @@ type RulesLoader interface {
 
 // Rules holds all configured rules.
 type Rules struct {
-	CPU []analyse.CPURule
+	CPU  []analyse.CPURule
+	Disk []analyse.DiskRule
 }
