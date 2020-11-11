@@ -20,3 +20,5 @@ vendor/
 .idea
 
 .data/
+config.toml
+rules.toml
