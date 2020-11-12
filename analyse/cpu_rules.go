@@ -36,7 +36,7 @@ func (c CPURule) Analyse(data stats.Data) (Result, error) {
 			return data.CPU != want
 		}
 	default:
-		return Result{}, fmt.Errorf("CPU rule '%s': %w", c.Name, CompareMatchingError)
+		return Result{}, fmt.Errorf("CPU rule '%s': %w", c.Name, ErrCompareMatching)
 	}
 
 	notification.Status = c.compare(cf, c.Compare)

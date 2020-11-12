@@ -6,12 +6,14 @@ import (
 	"github.com/hamburghammer/gmon/stats"
 )
 
+// DiskRule holds one rule to analyse the disk usage.
 type DiskRule struct {
 	Rule
 	Warning int
 	Alert   int
 }
 
+// Analyse analyses the given data based on the rules.
 func (dr DiskRule) Analyse(data stats.Data) (Result, error) {
 	notification := Result{Title: dr.Name, Description: dr.Description}
 	var cf compareIntFunc
@@ -34,7 +36,7 @@ func (dr DiskRule) Analyse(data stats.Data) (Result, error) {
 			return data.Disk.Used != want
 		}
 	default:
-		return Result{}, fmt.Errorf("Disk rule '%s': %w", dr.Name, CompareMatchingError)
+		return Result{}, fmt.Errorf("Disk rule '%s': %w", dr.Name, ErrCompareMatching)
 	}
 
 	notification.Status = dr.compare(cf, dr.Compare)
