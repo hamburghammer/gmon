@@ -11,4 +11,5 @@ type RulesLoader interface {
 type Rules struct {
 	CPU  []analyse.CPURule
 	Disk []analyse.DiskRule
+	RAM  []analyse.RAMRule
 }

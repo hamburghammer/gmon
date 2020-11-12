@@ -46,7 +46,7 @@ func main() {
 	}
 	rules, err := config.NewTOMLRulesLoader(rulesReader).Load()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Parsing the toml file '%s' produced an error: %s", args.RulePath, err)
 	}
 	log.Printf("%+v", rules)
 
@@ -81,6 +81,7 @@ func Monitor(statsClient stats.Client, gotifyClient alert.Notifier, interval int
 
 		applyRules(cpuRulesToAnalyse(rules.CPU), data, gotifyClient)
 		applyRules(diskRulesToAnalyse(rules.Disk), data, gotifyClient)
+		applyRules(ramRulesToAnalyse(rules.RAM), data, gotifyClient)
 
 		time.Sleep(time.Duration(interval) * time.Minute)
 	}
@@ -115,6 +116,15 @@ func cpuRulesToAnalyse(rs []analyse.CPURule) []analyse.Analyser {
 }
 
 func diskRulesToAnalyse(rs []analyse.DiskRule) []analyse.Analyser {
+	rules := make([]analyse.Analyser, len(rs))
+	for i, r := range rs {
+		rules[i] = r
+	}
+
+	return rules
+}
+
+func ramRulesToAnalyse(rs []analyse.RAMRule) []analyse.Analyser {
 	rules := make([]analyse.Analyser, len(rs))
 	for i, r := range rs {
 		rules[i] = r
