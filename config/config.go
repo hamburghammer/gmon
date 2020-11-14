@@ -4,13 +4,17 @@ import "errors"
 
 // Loader interface to load a config
 type Loader interface {
-	Load() (Data, error)
+	Load() (Config, error)
 }
 
-// Data the configuration for all clients and the rules for the evaluations
-type Data struct {
+// Config the configuration for all clients and the rules for the evaluations
+type Config struct {
 	Stats  Stats
 	Gotify Gotify
+
+	// Interval configures the rate in with it should check for updates.
+	// It's given as minutes -> ones every x minutes.
+	Interval int
 }
 
 // Stats the configuration to configure a stats client

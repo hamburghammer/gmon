@@ -4,3 +4,12 @@ services:
     image: gotify/server:latest
     ports:
       - "80:80"
+    environment: 
+      - "TZ=Europe/Berlin"
+    volumes: 
+      - ./.data:/app/data
+
+  gsave:
+    build: ./gsave/
+    ports: 
+      - 8080:8080
