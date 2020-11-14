@@ -50,7 +50,7 @@ func TestTomlLoader_LoadGotifyConfig(t *testing.T) {
 }
 
 func TestTomlLoader_LoadIntervalConfig(t *testing.T) {
-	file := &mockReader{content: []byte("rate = 1")}
+	file := &mockReader{content: []byte("interval = 1")}
 
 	want := Config{Interval: 1}
 	got, err := TomlConfigLoader{reader: file}.Load()
