@@ -36,7 +36,7 @@ func (rr RAMRule) Analyse(data stats.Data) (Result, error) {
 			return data.Mem.Used != want
 		}
 	default:
-		return Result{}, fmt.Errorf("Disk rule '%s': %w", rr.Name, ErrCompareMatching)
+		return Result{}, fmt.Errorf("RAM rule '%s': %w", rr.Name, ErrCompareMatching)
 	}
 
 	notification.Status = rr.compare(cf, rr.Compare)
@@ -45,10 +45,10 @@ func (rr RAMRule) Analyse(data stats.Data) (Result, error) {
 
 func (rr RAMRule) compare(cf compareIntFunc, compareChar string) Status {
 	if rr.Alert != 0 && cf(rr.Alert) {
-		return Status{AlertStatus: StatusAlert, StatusMessage: fmt.Sprintf("Disk usage %s as %d", compareChar, rr.Alert)}
+		return Status{AlertStatus: StatusAlert, StatusMessage: fmt.Sprintf("RAM usage %s as %d", compareChar, rr.Alert)}
 	} else if rr.Warning != 0 && cf(rr.Warning) {
-		return Status{AlertStatus: StatusWarning, StatusMessage: fmt.Sprintf("Disk usage %s as %d", compareChar, rr.Warning)}
+		return Status{AlertStatus: StatusWarning, StatusMessage: fmt.Sprintf("RAM usage %s as %d", compareChar, rr.Warning)}
 	}
 
-	return Status{AlertStatus: StatusOK, StatusMessage: "Disk usage is OK"}
+	return Status{AlertStatus: StatusOK, StatusMessage: "RAM usage is OK"}
 }
