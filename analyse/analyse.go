@@ -32,4 +32,5 @@ type Result struct {
 // Analyser is an interface that should be implemented by actors that analyse data based on some rules.
 type Analyser interface {
 	Analyse(stats.Data) (Result, error)
+	IsDeactivated() bool
 }

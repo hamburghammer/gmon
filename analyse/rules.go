@@ -18,3 +18,8 @@ type Rule struct {
 	// Compare has to be '>', '<', '=' or '!='
 	Compare string
 }
+
+// IsDeactivated returns the status if the rule is deactivated or not.
+func (r Rule) IsDeactivated() bool {
+	return r.Deactivated
+}

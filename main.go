@@ -87,19 +87,34 @@ func Monitor(statsClient stats.Client, gotifyClient alert.Notifier, interval int
 	}
 }
 
-func applyRules(rules []analyse.Analyser, stats stats.Data, gotifyClient alert.Notifier) error {
+func applyRules(rules []analyse.Analyser, stat stats.Data, notifier alert.Notifier) error {
 	for _, rule := range rules {
-		result, err := rule.Analyse(stats)
+		err := applyRule(rule, stat, notifier)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		log.Println(result)
-		if result.AlertStatus != analyse.StatusOK {
-			err = gotifyClient.Notify(alert.Data{Title: result.Title, Message: result.StatusMessage})
-			if err != nil {
-				return err
-			}
+	}
+
+	return nil
+}
+
+func applyRule(rule analyse.Analyser, stat stats.Data, notifier alert.Notifier) error {
+	if rule.IsDeactivated() {
+		return nil
+	}
+
+	result, err := rule.Analyse(stat)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Println(result)
+
+	if result.AlertStatus != analyse.StatusOK {
+		err = notifier.Notify(alert.Data{Title: result.Title, Message: result.StatusMessage})
+		if err != nil {
+			return err
 		}
 	}
 
