@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -36,7 +35,6 @@ func (sc SimpleClient) GetData() (Data, error) {
 		return Data{}, err
 	}
 
-	log.Println(string(body))
 	var jd []jsonData
 	err = json.Unmarshal(body, &jd)
 	if len(jd) < 1 {
@@ -70,7 +68,6 @@ func (sc SimpleClient) buildRequest() (*http.Request, error) {
 	if err != nil {
 		return &http.Request{}, err
 	}
-	log.Println(url)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
