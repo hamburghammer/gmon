@@ -62,5 +62,7 @@ steps:
     port:
       from_secret: SSH_PORT
     script:
-      - echo hello
-      - echo world
+      - gmon_deployment.sh
+
+depends_on:
+  - docker
