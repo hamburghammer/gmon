@@ -64,5 +64,8 @@ steps:
     script:
       - gmon_deployment.sh
 
-depends_on:
-  - docker
+trigger:
+  event:
+  - promote
+  target:
+  - production
