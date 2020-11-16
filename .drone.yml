@@ -44,3 +44,23 @@ steps:
 
 depends_on:
   - tests
+
+---
+kind: pipeline
+name: deployment
+
+steps:
+- name: ssh commands
+  image: appleboy/drone-ssh
+  settings:
+    host:
+      from_secret: SSH_HOST
+    username:
+      from_secret: SSH_USERNAME
+    password:
+      from_secret: SSH_PASSWORD
+    port:
+      from_secret: SSH_PORT
+    script:
+      - echo hello
+      - echo world
