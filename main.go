@@ -3,10 +3,8 @@ package main
 import (
 	"io"
 	"os"
-	"time"
 
 	"github.com/hamburghammer/gmon/alert"
-	"github.com/hamburghammer/gmon/analyse"
 	"github.com/hamburghammer/gmon/config"
 	"github.com/hamburghammer/gmon/stats"
 	"github.com/jessevdk/go-flags"
@@ -75,7 +73,8 @@ func main() {
 	statsClient := stats.NewSimpleClient(configuration.Stats.Token, configuration.Stats.Endpoint, configuration.Stats.Hostname)
 	gotifyClient := alert.NewGotifyClient(configuration.Gotify.Token, configuration.Gotify.Endpoint)
 
-	err = Monitor(statsClient, gotifyClient, configuration.Interval, rules)
+	monitoring := NewMonitoring(statsClient, gotifyClient, rules, configuration.Interval)
+	err = monitoring.Monitor()
 	if err != nil {
 		logPackage.Fatalln(err)
 	}
@@ -87,57 +86,4 @@ func loadFile(path string) (io.Reader, error) {
 		return nil, err
 	}
 	return f, nil
-}
-
-// Monitor the stats -> get, analyse and notify
-func Monitor(statsClient stats.Client, gotifyClient alert.Notifier, interval int, rules config.Rules) error {
-	for {
-		data, err := statsClient.GetData()
-		if err != nil {
-			return err
-		}
-
-		var f analyse.Analyser
-		f = analyse.CPURule{}
-		f.Analyse(stats.Data{})
-
-		applyRules(rules.GetCPU(), data, gotifyClient)
-		applyRules(rules.GetDisk(), data, gotifyClient)
-		applyRules(rules.GetRAM(), data, gotifyClient)
-
-		time.Sleep(time.Duration(interval) * time.Minute)
-	}
-}
-
-func applyRules(rules []analyse.Analyser, stat stats.Data, notifier alert.Notifier) error {
-	for _, rule := range rules {
-		err := applyRule(rule, stat, notifier)
-		if err != nil {
-			logPackage.Errorln(err)
-			continue
-		}
-	}
-
-	return nil
-}
-
-func applyRule(rule analyse.Analyser, stat stats.Data, notifier alert.Notifier) error {
-	if rule.IsDeactivated() {
-		return nil
-	}
-
-	result, err := rule.Analyse(stat)
-	if err != nil {
-		return err
-	}
-	logPackage.Infoln(result)
-
-	if result.AlertStatus != analyse.StatusOK {
-		err = notifier.Notify(alert.Data{Title: result.Title, Message: result.StatusMessage})
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
