@@ -51,6 +51,8 @@ func initLogging(args arguments) {
 func main() {
 	args := parseArgs()
 
+	initLogging(args)
+
 	configReader, err := loadFile(args.ConfigPath)
 	if err != nil {
 		logPackage.Fatalln(err)
