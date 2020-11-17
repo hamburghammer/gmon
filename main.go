@@ -101,9 +101,9 @@ func Monitor(statsClient stats.Client, gotifyClient alert.Notifier, interval int
 		f = analyse.CPURule{}
 		f.Analyse(stats.Data{})
 
-		applyRules(cpuRulesToAnalyse(rules.CPU), data, gotifyClient)
-		applyRules(diskRulesToAnalyse(rules.Disk), data, gotifyClient)
-		applyRules(ramRulesToAnalyse(rules.RAM), data, gotifyClient)
+		applyRules(rules.GetCPU(), data, gotifyClient)
+		applyRules(rules.GetDisk(), data, gotifyClient)
+		applyRules(rules.GetRAM(), data, gotifyClient)
 
 		time.Sleep(time.Duration(interval) * time.Minute)
 	}
@@ -140,31 +140,4 @@ func applyRule(rule analyse.Analyser, stat stats.Data, notifier alert.Notifier) 
 	}
 
 	return nil
-}
-
-func cpuRulesToAnalyse(rs []analyse.CPURule) []analyse.Analyser {
-	rules := make([]analyse.Analyser, len(rs))
-	for i, r := range rs {
-		rules[i] = r
-	}
-
-	return rules
-}
-
-func diskRulesToAnalyse(rs []analyse.DiskRule) []analyse.Analyser {
-	rules := make([]analyse.Analyser, len(rs))
-	for i, r := range rs {
-		rules[i] = r
-	}
-
-	return rules
-}
-
-func ramRulesToAnalyse(rs []analyse.RAMRule) []analyse.Analyser {
-	rules := make([]analyse.Analyser, len(rs))
-	for i, r := range rs {
-		rules[i] = r
-	}
-
-	return rules
 }
