@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -51,29 +52,15 @@ func main() {
 
 	initLogging(args)
 
-	configReader, err := loadFile(args.ConfigPath)
+	configs, err := loadConfigFiles(args)
 	if err != nil {
 		logPackage.Fatalln(err)
 	}
-	configuration, err := config.NewTomlConfigLoader(configReader).Load()
-	if err != nil {
-		logPackage.Fatalf("Parsing the toml file '%s' produced an error: %s\n", args.ConfigPath, err)
-	}
-	logPackage.Println(configuration)
 
-	rulesReader, err := loadFile(args.RulePath)
-	if err != nil {
-		logPackage.Fatalln(err)
-	}
-	rules, err := config.NewTOMLRulesLoader(rulesReader).Load()
-	if err != nil {
-		logPackage.Fatalf("Parsing the toml file '%s' produced an error: %s\n", args.RulePath, err)
-	}
+	statsClient := stats.NewSimpleClient(configs.Config.Stats.Token, configs.Config.Stats.Endpoint, configs.Config.Stats.Hostname)
+	gotifyClient := alert.NewGotifyClient(configs.Config.Gotify.Token, configs.Config.Gotify.Endpoint)
 
-	statsClient := stats.NewSimpleClient(configuration.Stats.Token, configuration.Stats.Endpoint, configuration.Stats.Hostname)
-	gotifyClient := alert.NewGotifyClient(configuration.Gotify.Token, configuration.Gotify.Endpoint)
-
-	monitoring := NewMonitoring(statsClient, gotifyClient, rules, configuration.Interval)
+	monitoring := NewMonitoring(statsClient, gotifyClient, configs.Rules, configs.Config.Interval)
 	err = monitoring.Monitor()
 	if err != nil {
 		logPackage.Fatalln(err)
@@ -86,4 +73,32 @@ func loadFile(path string) (io.Reader, error) {
 		return nil, err
 	}
 	return f, nil
+}
+
+type configs struct {
+	Config config.Config
+	Rules  config.Rules
+}
+
+func loadConfigFiles(args arguments) (configs, error) {
+	configReader, err := loadFile(args.ConfigPath)
+	if err != nil {
+		return configs{}, err
+	}
+	configuration, err := config.NewTomlConfigLoader(configReader).Load()
+	if err != nil {
+		return configs{}, fmt.Errorf("Parsing the toml file '%s' produced an error: %w", args.ConfigPath, err)
+	}
+	logPackage.Println(configuration)
+
+	rulesReader, err := loadFile(args.RulePath)
+	if err != nil {
+		return configs{}, err
+	}
+	rules, err := config.NewTOMLRulesLoader(rulesReader).Load()
+	if err != nil {
+		return configs{}, fmt.Errorf("Parsing the toml file '%s' produced an error: %w", args.ConfigPath, err)
+	}
+
+	return configs{Config: configuration, Rules: rules}, nil
 }
