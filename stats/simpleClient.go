@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -25,6 +24,7 @@ type SimpleClient struct {
 
 // GetData makes the reqest to get the data and returns them.
 func (sc SimpleClient) GetData() (Data, error) {
+	logPackage.Infof("Get stats for host %s\n", sc.hostname)
 	res, err := sc.makeRequest()
 	if err != nil {
 		return Data{}, err
@@ -36,7 +36,6 @@ func (sc SimpleClient) GetData() (Data, error) {
 		return Data{}, err
 	}
 
-	log.Println(string(body))
 	var jd []jsonData
 	err = json.Unmarshal(body, &jd)
 	if len(jd) < 1 {
@@ -70,7 +69,6 @@ func (sc SimpleClient) buildRequest() (*http.Request, error) {
 	if err != nil {
 		return &http.Request{}, err
 	}
-	log.Println(url)
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

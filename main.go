@@ -1,21 +1,25 @@
 package main
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"os"
-	"time"
 
 	"github.com/hamburghammer/gmon/alert"
-	"github.com/hamburghammer/gmon/analyse"
 	"github.com/hamburghammer/gmon/config"
 	"github.com/hamburghammer/gmon/stats"
 	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
 )
+
+var logPackage = log.WithField("package", "main")
 
 type arguments struct {
 	ConfigPath string `short:"c" long:"config" default:"./config.toml" description:"Set the path to the configuration file." env:"GMON_CONFIG_PATH"`
 	RulePath   string `short:"r" long:"rules" default:"./rules.toml" description:"Set the path to the file with the rules." env:"GMON_RULE_PATH"`
+	Verbose    bool   `short:"v" long:"verbose" description:"Set the logging output level to trace."`
+	Quiet      bool   `short:"q" long:"quiet" description:"Set the logging output level to error."`
+	JSON       bool   `long:"json" description:"Set the logging format to json."`
 }
 
 func parseArgs() arguments {
@@ -27,35 +31,40 @@ func parseArgs() arguments {
 	return args
 }
 
+func initLogging(args arguments) {
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
+
+	if args.Verbose {
+		log.SetLevel(log.TraceLevel)
+	}
+	if args.Quiet {
+		log.SetLevel(log.ErrorLevel)
+	}
+	if args.JSON {
+		log.SetFormatter(&log.JSONFormatter{})
+	}
+}
+
 func main() {
 	args := parseArgs()
 
-	configReader, err := loadFile(args.ConfigPath)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	configuration, err := config.NewTomlConfigLoader(configReader).Load()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Println(configuration)
+	initLogging(args)
 
-	rulesReader, err := loadFile(args.RulePath)
+	configs, err := loadConfigFiles(args)
 	if err != nil {
-		log.Fatalln(err)
+		logPackage.Fatalln(err)
 	}
-	rules, err := config.NewTOMLRulesLoader(rulesReader).Load()
-	if err != nil {
-		log.Fatalf("Parsing the toml file '%s' produced an error: %s", args.RulePath, err)
-	}
-	log.Printf("%+v", rules)
 
-	statsClient := stats.NewSimpleClient(configuration.Stats.Token, configuration.Stats.Endpoint, configuration.Stats.Hostname)
-	gotifyClient := alert.NewGotifyClient(configuration.Gotify.Token, configuration.Gotify.Endpoint)
+	statsClient := stats.NewSimpleClient(configs.Config.Stats.Token, configs.Config.Stats.Endpoint, configs.Config.Stats.Hostname)
+	gotifyClient := alert.NewGotifyClient(configs.Config.Gotify.Token, configs.Config.Gotify.Endpoint)
 
-	err = Monitor(statsClient, gotifyClient, configuration.Interval, rules)
+	monitoring := NewMonitoring(statsClient, gotifyClient, configs.Rules, configs.Config.Interval)
+	logPackage.Infof("Start monitoring: %s", configs.Config.Stats.Hostname)
+	err = monitoring.Monitor()
 	if err != nil {
-		log.Fatalln(err)
+		logPackage.Fatalln(err)
 	}
 }
 
@@ -67,83 +76,33 @@ func loadFile(path string) (io.Reader, error) {
 	return f, nil
 }
 
-// Monitor the stats -> get, analyse and notify
-func Monitor(statsClient stats.Client, gotifyClient alert.Notifier, interval int, rules config.Rules) error {
-	for {
-		data, err := statsClient.GetData()
-		if err != nil {
-			return err
-		}
-
-		var f analyse.Analyser
-		f = analyse.CPURule{}
-		f.Analyse(stats.Data{})
-
-		applyRules(cpuRulesToAnalyse(rules.CPU), data, gotifyClient)
-		applyRules(diskRulesToAnalyse(rules.Disk), data, gotifyClient)
-		applyRules(ramRulesToAnalyse(rules.RAM), data, gotifyClient)
-
-		time.Sleep(time.Duration(interval) * time.Minute)
-	}
+type configs struct {
+	Config config.Config
+	Rules  config.Rules
 }
 
-func applyRules(rules []analyse.Analyser, stat stats.Data, notifier alert.Notifier) error {
-	for _, rule := range rules {
-		err := applyRule(rule, stat, notifier)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-	}
-
-	return nil
-}
-
-func applyRule(rule analyse.Analyser, stat stats.Data, notifier alert.Notifier) error {
-	if rule.IsDeactivated() {
-		return nil
-	}
-
-	result, err := rule.Analyse(stat)
+func loadConfigFiles(args arguments) (configs, error) {
+	logPackage.Infoln("Start loading the config file.")
+	configReader, err := loadFile(args.ConfigPath)
 	if err != nil {
-		log.Println(err)
-		return err
+		return configs{}, err
 	}
-	log.Println(result)
-
-	if result.AlertStatus != analyse.StatusOK {
-		err = notifier.Notify(alert.Data{Title: result.Title, Message: result.StatusMessage})
-		if err != nil {
-			return err
-		}
+	configuration, err := config.NewTomlConfigLoader(configReader).Load()
+	if err != nil {
+		return configs{}, fmt.Errorf("Parsing the toml file '%s' produced an error: %w", args.ConfigPath, err)
 	}
+	logPackage.Infoln("Finished loading the config file.")
 
-	return nil
-}
-
-func cpuRulesToAnalyse(rs []analyse.CPURule) []analyse.Analyser {
-	rules := make([]analyse.Analyser, len(rs))
-	for i, r := range rs {
-		rules[i] = r
+	logPackage.Infoln("Start loading the rule file.")
+	rulesReader, err := loadFile(args.RulePath)
+	if err != nil {
+		return configs{}, err
 	}
-
-	return rules
-}
-
-func diskRulesToAnalyse(rs []analyse.DiskRule) []analyse.Analyser {
-	rules := make([]analyse.Analyser, len(rs))
-	for i, r := range rs {
-		rules[i] = r
+	rules, err := config.NewTOMLRulesLoader(rulesReader).Load()
+	if err != nil {
+		return configs{}, fmt.Errorf("Parsing the toml file '%s' produced an error: %w", args.ConfigPath, err)
 	}
+	logPackage.Infoln("Finished loading the rule file.")
 
-	return rules
-}
-
-func ramRulesToAnalyse(rs []analyse.RAMRule) []analyse.Analyser {
-	rules := make([]analyse.Analyser, len(rs))
-	for i, r := range rs {
-		rules[i] = r
-	}
-
-	return rules
+	return configs{Config: configuration, Rules: rules}, nil
 }

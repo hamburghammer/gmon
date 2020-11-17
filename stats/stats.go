@@ -1,6 +1,12 @@
 package stats
 
-import "time"
+import (
+	"time"
+
+	log "github.com/sirupsen/logrus"
+)
+
+var logPackage = log.WithField("package", "stats")
 
 // Client is the interface to be implement by a client to access the external data.
 type Client interface {

@@ -2,7 +2,6 @@ package stats
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -29,7 +28,6 @@ func (jd jsonData) transformToData() (Data, error) {
 }
 
 func (jd jsonData) parseDateToTime() (time.Time, error) {
-	log.Println(jd.Date)
 	t, err := time.Parse(time.RFC3339, jd.Date)
 	if err != nil {
 		return time.Now(), fmt.Errorf("parsing the json Date string produced an error: %w", err)

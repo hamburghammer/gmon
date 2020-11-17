@@ -1,5 +1,9 @@
 package alert
 
+import log "github.com/sirupsen/logrus"
+
+var logPackage = log.WithField("package", "alert")
+
 // Notifier to send notifications to an endpoint
 type Notifier interface {
 	Notify(Data) error
