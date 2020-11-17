@@ -19,7 +19,7 @@ type arguments struct {
 	RulePath   string `short:"r" long:"rules" default:"./rules.toml" description:"Set the path to the file with the rules." env:"GMON_RULE_PATH"`
 	Verbose    bool   `short:"v" long:"verbose" description:"Set the logging output level to trace."`
 	Quiet      bool   `short:"q" long:"quiet" description:"Set the logging output level to error."`
-	JSON       bool   `long:"json" description:"Set the logging format to json"`
+	JSON       bool   `long:"json" description:"Set the logging format to json."`
 }
 
 func parseArgs() arguments {
@@ -61,6 +61,7 @@ func main() {
 	gotifyClient := alert.NewGotifyClient(configs.Config.Gotify.Token, configs.Config.Gotify.Endpoint)
 
 	monitoring := NewMonitoring(statsClient, gotifyClient, configs.Rules, configs.Config.Interval)
+	logPackage.Infof("Start monitoring: %s", configs.Config.Stats.Hostname)
 	err = monitoring.Monitor()
 	if err != nil {
 		logPackage.Fatalln(err)
@@ -81,6 +82,7 @@ type configs struct {
 }
 
 func loadConfigFiles(args arguments) (configs, error) {
+	logPackage.Infoln("Start loading the config file.")
 	configReader, err := loadFile(args.ConfigPath)
 	if err != nil {
 		return configs{}, err
@@ -89,8 +91,9 @@ func loadConfigFiles(args arguments) (configs, error) {
 	if err != nil {
 		return configs{}, fmt.Errorf("Parsing the toml file '%s' produced an error: %w", args.ConfigPath, err)
 	}
-	logPackage.Println(configuration)
+	logPackage.Infoln("Finished loading the config file.")
 
+	logPackage.Infoln("Start loading the rule file.")
 	rulesReader, err := loadFile(args.RulePath)
 	if err != nil {
 		return configs{}, err
@@ -99,6 +102,7 @@ func loadConfigFiles(args arguments) (configs, error) {
 	if err != nil {
 		return configs{}, fmt.Errorf("Parsing the toml file '%s' produced an error: %w", args.ConfigPath, err)
 	}
+	logPackage.Infoln("Finished loading the rule file.")
 
 	return configs{Config: configuration, Rules: rules}, nil
 }

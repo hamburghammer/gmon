@@ -22,6 +22,7 @@ type GotifyClient struct {
 
 // Notify makes the request to push the data to the gotify server.
 func (sc GotifyClient) Notify(data Data) error {
+	logPackage.Infof("Sending a notification with the title: %s\n", data.Title)
 	_, err := sc.makeRequest(data)
 	if err != nil {
 		return err

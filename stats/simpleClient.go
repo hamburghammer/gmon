@@ -24,6 +24,7 @@ type SimpleClient struct {
 
 // GetData makes the reqest to get the data and returns them.
 func (sc SimpleClient) GetData() (Data, error) {
+	logPackage.Infof("Get stats for host %s\n", sc.hostname)
 	res, err := sc.makeRequest()
 	if err != nil {
 		return Data{}, err
