@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type mockHTTPClient struct {
@@ -44,11 +44,11 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		simpleClient = simpleClient.WithHTTPClient(&mockClient)
 
 		_, err := simpleClient.GetData()
-		assert.Error(t, err)
+		require.Error(t, err)
 
 		want := fmt.Sprintf("/hosts/%s/stats", hostname)
 
-		assert.Equal(t, want, mockClient.req.URL.Path)
+		require.Equal(t, want, mockClient.req.URL.Path)
 	})
 
 	t.Run("should build url with the token as header", func(t *testing.T) {
@@ -58,9 +58,9 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		simpleClient = simpleClient.WithHTTPClient(&mockClient)
 
 		_, err := simpleClient.GetData()
-		assert.Error(t, err)
+		require.Error(t, err)
 
-		assert.Equal(t, token, mockClient.req.Header.Get("Token"))
+		require.Equal(t, token, mockClient.req.Header.Get("Token"))
 	})
 
 	t.Run("should return error if url could not be parse", func(t *testing.T) {
@@ -70,11 +70,11 @@ func TestSimpleClientRequestBuilding(t *testing.T) {
 		simpleClient = simpleClient.WithHTTPClient(mockClient)
 
 		_, err := simpleClient.GetData()
-		assert.NotNil(t, err)
+		require.NotNil(t, err)
 
 		want := "parse \" https:\": first path segment in URL cannot contain colon"
 
-		assert.Equal(t, want, err.Error())
+		require.Equal(t, want, err.Error())
 	})
 }
 
@@ -88,7 +88,7 @@ func TestSimpleClientGetData(t *testing.T) {
 		want := Data{Hostname: "foo", Date: parsedTime, CPU: 1.9900497512574382, Mem: Memory{Used: 4621, Total: 16022}, Disk: Memory{Used: 51271, Total: 224323}, Processes: []Process{{Name: "gstat", Pid: 1, CPU: 37.58064430461327}}}
 		got, err := mockClient.GetData()
 
-		assert.Nil(t, err)
-		assert.Equal(t, want, got)
+		require.Nil(t, err)
+		require.Equal(t, want, got)
 	})
 }

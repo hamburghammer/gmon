@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type mockHTTPClient struct {
@@ -44,9 +44,9 @@ func TestGotifyClientRequestBuilding(t *testing.T) {
 		simpleClient = simpleClient.WithHTTPClient(&mockClient)
 
 		err := simpleClient.Notify(data)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 
-		assert.Equal(t, token, mockClient.req.Header.Get("X-Gotify-Key"))
+		require.Equal(t, token, mockClient.req.Header.Get("X-Gotify-Key"))
 	})
 
 	t.Run("should return error if url could not be parse", func(t *testing.T) {
@@ -56,10 +56,10 @@ func TestGotifyClientRequestBuilding(t *testing.T) {
 		simpleClient = simpleClient.WithHTTPClient(mockClient)
 
 		err := simpleClient.Notify(data)
-		assert.NotNil(t, err)
+		require.NotNil(t, err)
 
 		want := "parse \" https:\": first path segment in URL cannot contain colon"
 
-		assert.Equal(t, want, err.Error())
+		require.Equal(t, want, err.Error())
 	})
 }
