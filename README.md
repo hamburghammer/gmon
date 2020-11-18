@@ -13,7 +13,7 @@ It will look for this files inside the current directory. To specify another pat
 
 ### config.toml
 Example configuration:
-```
+```toml
 # The interval in which it should check for new data.
 interval = 1
 
@@ -31,7 +31,7 @@ token = "AzCkehMSkHFlphf"
 
 ### rules.toml
 Example configuration:
-```
+```toml
 [[CPU]]
 Name = "Unexpected CPU usage"
 Description = "More than 50% of CPU utilization"
