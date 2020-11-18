@@ -26,7 +26,7 @@ token = "foo"
 # Configuration for the gotify notification endpoint.
 [gotify]
 endpoint = "http://localhost:80"
-token = "AzCkehMSkHFlphf
+token = "AzCkehMSkHFlphf"
 ```
 
 ### rules.toml
